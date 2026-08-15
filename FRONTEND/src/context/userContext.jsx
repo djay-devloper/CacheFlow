@@ -1,6 +1,15 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { BASE_URL } from '../utils/apiPaths';
 
 export const UserContext = createContext();
+
+const normalizeProfileImageUrl = (profileImageUrl) => {
+    if (!profileImageUrl) return profileImageUrl;
+    if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//i.test(profileImageUrl)) {
+        return profileImageUrl.replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i, BASE_URL.replace(/\/$/, ''));
+    }
+    return profileImageUrl;
+};
 
 export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null);
@@ -11,7 +20,11 @@ export const UserProvider = ({ children }) => {
         try {
             const storedUser = localStorage.getItem('user');
             if (storedUser) {
-                setUser(JSON.parse(storedUser));
+                const parsedUser = JSON.parse(storedUser);
+                const normalizedUser = parsedUser?.profileImageUrl
+                    ? { ...parsedUser, profileImageUrl: normalizeProfileImageUrl(parsedUser.profileImageUrl) }
+                    : parsedUser;
+                setUser(normalizedUser);
             }
         } catch (error) {
             console.error('Failed to parse stored user data:', error);
@@ -22,10 +35,14 @@ export const UserProvider = ({ children }) => {
 
     // Function to update user information
     const updateUser = (userData) => {
-        setUser(userData);
+        const normalizedUser = userData?.profileImageUrl
+            ? { ...userData, profileImageUrl: normalizeProfileImageUrl(userData.profileImageUrl) }
+            : userData;
+
+        setUser(normalizedUser);
         // Persist user data to localStorage
         try {
-            localStorage.setItem('user', JSON.stringify(userData));
+            localStorage.setItem('user', JSON.stringify(normalizedUser));
         } catch (error) {
             console.error('Failed to save user data to localStorage:', error);
         }
