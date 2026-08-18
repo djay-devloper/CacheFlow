@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../context/userContext';
 import axiosInstance from '../../utils/axiosInstance';
@@ -6,9 +6,10 @@ import { API_PATHS } from '../../utils/apiPaths';
 import Navbar from './Navbar';
 import SideMenu from './SideMenu';
 
-const DashboardLayout = ({activeMenu, children}) => {
-    const {user, updateUser} = useContext(UserContext);
+const DashboardLayout = ({ activeMenu, children }) => {
+    const { user, updateUser } = useContext(UserContext);
     const navigate = useNavigate();
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -18,7 +19,6 @@ const DashboardLayout = ({activeMenu, children}) => {
                     updateUser(response.data);
                 } catch (error) {
                     console.error('Error fetching user data:', error);
-                    // If there's an error, redirect to login
                     localStorage.removeItem('token');
                     navigate('/login');
                 }
@@ -29,19 +29,43 @@ const DashboardLayout = ({activeMenu, children}) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-  return (
-    <div className="">
-        <Navbar activeMenu={activeMenu} />
+    const closeSidebar = () => setIsSidebarOpen(false);
 
-        <div className="flex">
-            <div className="max-[1080px]:hidden">
-                <SideMenu activeMenu={activeMenu} />
+    return (
+        <div className="min-h-screen w-full overflow-x-hidden bg-[#fcfbfc]">
+            <Navbar
+                activeMenu={activeMenu}
+                isSidebarOpen={isSidebarOpen}
+                onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
+                onCloseSidebar={closeSidebar}
+            />
+
+            <div className="flex min-h-[calc(100vh-61px)] w-full">
+                {isSidebarOpen && (
+                    <div
+                        className="fixed inset-0 z-30 bg-black/50 lg:hidden"
+                        onClick={closeSidebar}
+                    />
+                )}
+
+                <aside
+                    className={`
+                        fixed left-0 top-[61px] z-40 h-[calc(100vh-61px)] w-64 transition-transform duration-300 ease-in-out
+                        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+                    `}
+                >
+                    <SideMenu
+                        activeMenu={activeMenu}
+                        onMenuClick={closeSidebar}
+                    />
+                </aside>
+
+                <main className="flex-1 px-3 py-4 sm:px-5 lg:px-6">
+                    {children}
+                </main>
             </div>
-
-            <div className="grow mx-5">{children}</div>
         </div>
-    </div>
-  );
-}
+    );
+};
 
 export default DashboardLayout;

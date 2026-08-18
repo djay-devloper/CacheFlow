@@ -1,61 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { HiOutlineMenu, HiOutlineX } from 'react-icons/hi';
-import SideMenu from './SideMenu';
 
-const Navbar = ({ activeMenu }) => {
-  const [openSideMenu, setOpenSideMenu] = useState(false);
-
-  // Close menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (openSideMenu && !event.target.closest('.mobile-menu-container')) {
-        setOpenSideMenu(false);
-      }
-    };
-
-    if (openSideMenu) {
-      document.addEventListener('click', handleClickOutside);
-      // Prevent body scroll when menu is open
-      document.body.style.overflow = 'hidden';
-    }
-
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-      document.body.style.overflow = 'unset';
-    };
-  }, [openSideMenu]);
-
+const Navbar = ({ activeMenu, isSidebarOpen, onToggleSidebar, onCloseSidebar }) => {
   return (
-    <div className="flex items-center gap-5 bg-white border-b border-gray-200/50 py-4 px-7 sticky top-0 z-50">
+    <div className="sticky top-0 z-50 flex items-center gap-5 border-b border-gray-200/50 bg-white px-4 py-4 sm:px-7">
       <button
-        className="text-black mobile-menu-container"
-        onClick={() => setOpenSideMenu(!openSideMenu)}
+        className="mobile-menu-container flex h-10 w-10 items-center justify-center rounded-lg text-black transition hover:bg-gray-100"
+        onClick={() => {
+          if (isSidebarOpen) {
+            onCloseSidebar();
+            return;
+          }
+          onToggleSidebar();
+        }}
         aria-label="Toggle menu"
       >
-        {openSideMenu ? (
+        {isSidebarOpen ? (
           <HiOutlineX className="text-2xl" />
         ) : (
           <HiOutlineMenu className="text-2xl" />
         )}
       </button>
 
-      <h2 className="text-lg font-medium text-black">Expense Tracker</h2>
-
-      {openSideMenu && (
-        <>
-          {/* Backdrop */}
-          <div 
-            className="fixed inset-0 bg-black/50 z-30 top-[61px]"
-            onClick={() => setOpenSideMenu(false)}
-          />
-          {/* Mobile Menu */}
-          <div className="fixed top-[61px] left-0 bg-white shadow-lg z-40 mobile-menu-container h-[calc(100vh-61px)] overflow-y-auto">
-            <SideMenu activeMenu={activeMenu} onMenuClick={() => setOpenSideMenu(false)} />
-          </div>
-        </>
-      )}
+      <h2 className="text-lg font-medium text-black">CacheFlow</h2>
     </div>
   );
-}
+};
 
 export default Navbar;
