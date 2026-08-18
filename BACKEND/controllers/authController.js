@@ -89,3 +89,30 @@ exports.getUserInfo = async (req, res) => {
     res.status(500).json({ message: "Error getting user info", error: err.message });
  }
 };
+
+exports.updateProfileImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const baseUrl = (process.env.PUBLIC_BASE_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/, '');
+    const imageUrl = `${baseUrl}/uploads/${encodeURIComponent(req.file.filename)}`;
+
+    user.profileImageUrl = imageUrl;
+    await user.save();
+
+    res.status(200).json({
+      message: 'Profile image updated successfully',
+      imageUrl,
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating profile image', error: error.message });
+  }
+};
