@@ -5,6 +5,7 @@ const { protect } = require('../middleware/authMiddleware');
 const { registerUser,
      loginUser, 
      getUserInfo,
+     updateProfileImage,
      } = require('../controllers/authController');
 const upload = require('../middleware/uploadMiddleware');
 
@@ -18,16 +19,7 @@ router.post('/login', loginUser);
 
  router.get('/getUser',protect,getUserInfo);
 
-
- router.post("/upload-image",upload.single('image'), (req, res) => {
-     if (!req.file) {
-           return res.status(400).json({ message: 'No file uploaded' });
-     }
-
-     const baseUrl = (process.env.PUBLIC_BASE_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/, '');
-     const imageUrl = `${baseUrl}/uploads/${encodeURIComponent(req.file.filename)}`;
-     res.status(200).json({ imageUrl });
- });
+ router.post('/upload-image', protect, upload.single('image'), updateProfileImage);
 
 
  
