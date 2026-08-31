@@ -2,6 +2,7 @@ import React from 'react';
 import { LuArrowRight } from 'react-icons/lu';
 import moment from 'moment';
 import { getCategoryIcon, addThousandSeparators } from '../../utils/helper';
+import { formatDateTimeInIndia } from '../../utils/helper';
 
 const RecentTransactions = ({ transactions, onSeeMore }) => {
   return (
@@ -29,7 +30,7 @@ const RecentTransactions = ({ transactions, onSeeMore }) => {
 
               <div className="flex-1 min-w-0">
                 <h6 className="text-sm font-medium text-gray-800">{title}</h6>
-                <p className="text-xs text-gray-500">{moment(item.date).format('DD MMM YYYY')}</p>
+                <p className="text-xs text-gray-500">{formatDateTimeInIndia(item.date)}</p>
               </div>
 
               <div className="text-right flex-shrink-0">

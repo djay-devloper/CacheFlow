@@ -7,6 +7,7 @@ import Input from '../../components/Inputs/Input';
 import { useUserAuth } from '../../hooks/useUserAuth';
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
+import { getIndiaDateTimeInputValue, getIndiaDateTimeISOString } from '../../utils/helper';
 
 function Income() {
   useUserAuth();
@@ -18,7 +19,7 @@ function Income() {
   const [formData, setFormData] = React.useState({
     source: '',
     amount: '',
-    date: new Date().toISOString().split('T')[0],
+    date: getIndiaDateTimeInputValue(),
     icon: '',
   });
   const [error, setError] = React.useState('');
@@ -44,7 +45,7 @@ function Income() {
     setFormData({
       source: '',
       amount: '',
-      date: new Date().toISOString().split('T')[0],
+      date: getIndiaDateTimeInputValue(),
       icon: '',
     });
     setError('');
@@ -64,7 +65,7 @@ function Income() {
       await axiosInstance.post(API_PATHS.INCOME.ADD_INCOME, {
         source: formData.source,
         amount: Number(formData.amount),
-        date: formData.date,
+        date: getIndiaDateTimeISOString(formData.date),
         icon: formData.icon || undefined,
       });
 
@@ -176,8 +177,8 @@ function Income() {
                   onChange={(e) => setFormData((prev) => ({ ...prev, amount: e.target.value }))}
                 />
                 <Input
-                  label="Date"
-                  type="date"
+                  label="Date and time"
+                  type="datetime-local"
                   value={formData.date}
                   onChange={(e) => setFormData((prev) => ({ ...prev, date: e.target.value }))}
                 />

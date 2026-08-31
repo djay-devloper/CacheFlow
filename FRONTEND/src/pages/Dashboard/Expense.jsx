@@ -6,6 +6,7 @@ import Input from '../../components/Inputs/Input';
 import { useUserAuth } from '../../hooks/useUserAuth';
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
+import { getIndiaDateTimeInputValue, getIndiaDateTimeISOString } from '../../utils/helper';
 
 function Expense() {
   useUserAuth();
@@ -16,7 +17,7 @@ function Expense() {
   const [formData, setFormData] = React.useState({
     category: '',
     amount: '',
-    date: new Date().toISOString().split('T')[0],
+    date: getIndiaDateTimeInputValue(),
     icon: '',
   });
   const [error, setError] = React.useState('');
@@ -42,7 +43,7 @@ function Expense() {
     setFormData({
       category: '',
       amount: '',
-      date: new Date().toISOString().split('T')[0],
+      date: getIndiaDateTimeInputValue(),
       icon: '',
     });
     setError('');
@@ -62,7 +63,7 @@ function Expense() {
       await axiosInstance.post(API_PATHS.EXPENSE.ADD_EXPENSE, {
         category: formData.category,
         amount: Number(formData.amount),
-        date: formData.date,
+        date: getIndiaDateTimeISOString(formData.date),
         icon: formData.icon || undefined,
       });
 
@@ -182,8 +183,8 @@ function Expense() {
                   onChange={(e) => setFormData((prev) => ({ ...prev, amount: e.target.value }))}
                 />
                 <Input
-                  label="Date"
-                  type="date"
+                  label="Date and time"
+                  type="datetime-local"
                   value={formData.date}
                   onChange={(e) => setFormData((prev) => ({ ...prev, date: e.target.value }))}
                 />

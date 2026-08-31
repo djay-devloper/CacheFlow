@@ -2,6 +2,7 @@ import React from 'react';
 import { LuArrowRight, LuDownload } from 'react-icons/lu';
 import moment from 'moment';
 import { getCategoryIcon, addThousandSeparators } from '../../utils/helper';
+import { formatDateTimeInIndia } from '../../utils/helper';
 
 const ExpensesList = ({ expenses, onSeeMore, onDownload, hideSeeAll = false }) => {
   // Ensure expenses is an array
@@ -64,7 +65,7 @@ const ExpensesList = ({ expenses, onSeeMore, onDownload, hideSeeAll = false }) =
               {/* Category and Date */}
               <div className="flex-1 min-w-0">
                 <h6 className="text-sm font-medium text-gray-800">{expense.category}</h6>
-                <p className="text-xs text-gray-500">{moment(expense.date).format('DD MMM YYYY')}</p>
+                <p className="text-xs text-gray-500">{formatDateTimeInIndia(expense.date)}</p>
               </div>
 
               {/* Amount */}

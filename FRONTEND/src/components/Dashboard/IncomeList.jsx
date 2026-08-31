@@ -2,6 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import { LuArrowRight, LuDownload } from 'react-icons/lu';
 import { addThousandSeparators, getCategoryIcon } from '../../utils/helper';
+import { formatDateTimeInIndia } from '../../utils/helper';
 
 const IncomeList = ({ income, onSeeMore, onDownload, hideSeeAll = false }) => {
   const incomeArray = Array.isArray(income?.transactions) ? income.transactions : [];
@@ -55,7 +56,7 @@ const IncomeList = ({ income, onSeeMore, onDownload, hideSeeAll = false }) => {
 
               <div className="flex-1 min-w-0">
                 <h6 className="text-sm font-medium text-gray-800">{txn.source || 'Income'}</h6>
-                <p className="text-xs text-gray-500">{moment(txn.date).format('DD MMM YYYY')}</p>
+                <p className="text-xs text-gray-500">{formatDateTimeInIndia(txn.date)}</p>
               </div>
 
               <div className="text-right flex-shrink-0">
