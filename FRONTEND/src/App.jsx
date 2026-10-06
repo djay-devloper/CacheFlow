@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import { 
   BrowserRouter as Router,
   Routes,
@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom';
 import Login from './pages/auth/Login.jsx';
 import SignUp from './pages/auth/SignUp.jsx';
+import Landing from './pages/Landing.jsx';
 import Home from './pages/Dashboard/Home.jsx';
 import Expense from './pages/Dashboard/Expense.jsx';
 import Income from './pages/Dashboard/Income.jsx';
@@ -15,20 +16,9 @@ import UserProvider, { UserContext } from './context/userContext.jsx';
 
 const Root = () => {
   const { isInitialized } = useContext(UserContext);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Wait for context to be initialized, then check authentication
-    if (!isInitialized) return;
-    
-    const token = localStorage.getItem('token');
-    setIsAuthenticated(!!token);
-    setIsLoading(false);
-  }, [isInitialized]);
 
   // Show loading indicator while checking authentication
-  if (isLoading || !isInitialized) {
+  if (!isInitialized) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-50">
         <div className="text-center">
@@ -39,11 +29,11 @@ const Root = () => {
     );
   }
 
-  //Redirect to home if authenticated, otherwise to login
-  return isAuthenticated ? (
+  // Send authenticated users to their dashboard and signed-out users to the landing page.
+  return localStorage.getItem('token') ? (
     <Navigate to="/home" replace />
   ) : (
-    <Navigate to="/login" replace />  
+    <Landing />
   );
 };
 
