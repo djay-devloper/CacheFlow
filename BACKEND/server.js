@@ -7,6 +7,8 @@ const authRoutes = require("./routes/authRoutes");
 const incomeRoutes = require("./routes/incomeRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
+const reportRoutes = require("./routes/reportRoutes");
+const copilotRoutes = require("./routes/copilotRoutes");
 
 const app = express();
 
@@ -63,6 +65,8 @@ app.use(express.urlencoded({ extended: false }));
      app.use("/api/v1/income",incomeRoutes);
     app.use("/api/v1/expense",expenseRoutes);
     app.use("/api/v1/dashboard",dashboardRoutes);
+     app.use("/api/v1/reports",reportRoutes);
+     app.use("/api/v1/copilot",copilotRoutes);
 
 // Serve uploads folder 
 

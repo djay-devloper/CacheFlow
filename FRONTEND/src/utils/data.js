@@ -2,6 +2,8 @@ import {
     LuLayoutDashboard,
     LuHandCoins,
     LuWalletMinimal,
+    LuChartNoAxesCombined,
+    LuSparkles,
 } from 'react-icons/lu';
 import { HiLogout } from 'react-icons/hi';
 
@@ -23,6 +25,18 @@ export const SideMenuData = [
         label: "Expense",
         icon: LuHandCoins,
         path: "/expense",
+    },
+    {
+        id: "04",
+        label: "Reports",
+        icon: LuChartNoAxesCombined,
+        path: "/reports",
+    },
+    {
+        id: "05",
+        label: "AI Copilot",
+        icon: LuSparkles,
+        path: "/copilot",
     },
     {
         id: "06",

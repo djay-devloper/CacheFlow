@@ -1,6 +1,7 @@
 # Dependencies
 node_modules/
 package-lock.json
+!package-lock.json
 yarn.lock
 pnpm-lock.yaml
 
@@ -47,6 +48,7 @@ tmp/
 # Uploads directory (user-uploaded files)
 uploads/*
 !uploads/.gitkeep
+private-receipts/
 
 # Testing
 coverage/

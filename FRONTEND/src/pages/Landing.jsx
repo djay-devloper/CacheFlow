@@ -23,10 +23,10 @@ const features = [
       'Keep everyday expenses organized and spot patterns before they become surprises.',
   },
   {
-    icon: <LuTrendingUp className="text-xl" />,
-    title: 'Make progress feel simple',
+    icon: <LuSparkles className="text-xl" />,
+    title: 'Turn activity into insight',
     description:
-      'Follow your cash flow over time and make your next money decision with confidence.',
+      'Explore cash-flow reports and get answers about your recorded finances with AI.',
   },
 ];
 
@@ -65,9 +65,9 @@ function Landing() {
             A calmer way to manage your money
           </div>
           <h1 className="text-4xl font-bold leading-[1.1] tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
-            Make every
+            Make your
             <span className="block bg-gradient-to-r from-violet-600 to-fuchsia-500 bg-clip-text pb-1 text-transparent">
-              dollar make sense.
+              money make sense.
             </span>
           </h1>
           <p className="mt-6 max-w-lg text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
@@ -229,6 +229,27 @@ function Landing() {
           ))}
         </div>
       </section>
+
+      <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-12 lg:py-16">
+        <div className="relative overflow-hidden rounded-[2rem] bg-slate-950 px-6 py-10 text-white sm:px-10 sm:py-12 lg:flex lg:items-center lg:justify-between lg:px-14">
+          <div className="absolute -right-20 -top-32 h-72 w-72 rounded-full bg-violet-600/30 blur-3xl" />
+          <div className="relative max-w-2xl">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-violet-300">A better financial routine starts here</p>
+            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Bring your finances into focus.</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-300">Track everyday activity, understand your cash flow, and get more from your financial data.</p>
+          </div>
+          <Link to="/signup" className="relative mt-6 inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-violet-50 lg:mt-0">
+            Create your account <LuArrowRight />
+          </Link>
+        </div>
+      </section>
+
+      <footer className="border-t border-slate-100 bg-white/70">
+        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-5 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-12">
+          <span>© {new Date().getFullYear()} CacheFlow</span>
+          <span>Your personal finance workspace.</span>
+        </div>
+      </footer>
 
     </main>
   );

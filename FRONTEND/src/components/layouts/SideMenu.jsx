@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../context/userContext';
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
-import { LuUpload } from 'react-icons/lu';
+import { LuCircleDollarSign, LuUpload } from 'react-icons/lu';
 
 const SideMenu = ({ activeMenu, onMenuClick, className = '' }) => {
   const { user, clearUser, updateUser } = useContext(UserContext);
@@ -60,23 +60,26 @@ const SideMenu = ({ activeMenu, onMenuClick, className = '' }) => {
   const profileImageSrc = user?.profileImageUrl || '/default-avatar.svg';
 
   return (
-    <div className={`flex h-full w-64 flex-col bg-white border-r border-gray-200/50 p-5 shadow-sm lg:shadow-none ${className}`}>
-      <div className="mb-8 flex flex-col items-center justify-center pt-10">
+    <div className={`flex h-full w-64 flex-col border-r border-slate-200/70 bg-white p-4 ${className}`}>
+      <div className="mb-7 flex items-center gap-3 px-2 pt-2">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-600 text-white shadow-md shadow-violet-600/20">
+          <LuCircleDollarSign className="text-2xl" />
+        </div>
         <div className="relative">
           <img
             src={profileImageSrc}
             alt="Profile Image"
-            className="h-24 w-24 rounded-full bg-slate-400 object-cover sm:h-28 sm:w-28"
+            className="h-10 w-10 rounded-full bg-slate-100 object-cover ring-2 ring-slate-100"
           />
 
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border border-white bg-[#875cf5] text-white shadow-md transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-70"
+            className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border border-white bg-violet-600 text-white shadow-sm transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-70"
             aria-label="Upload profile picture"
             disabled={isUploading}
           >
-            {isUploading ? <span className="text-xs font-bold">...</span> : <LuUpload className="text-sm" />}
+            {isUploading ? <span className="text-[9px] font-bold">...</span> : <LuUpload className="text-[10px]" />}
           </button>
 
           <input
@@ -87,24 +90,43 @@ const SideMenu = ({ activeMenu, onMenuClick, className = '' }) => {
             onChange={handleProfileImageUpload}
           />
         </div>
-        <h5 className="mt-2 text-center text-gray-950 font-medium leading-6">
-          {user?.fullName || ""}
-        </h5>
+        <div className="min-w-0">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">CacheFlow</p>
+          <h5 className="truncate text-sm font-semibold leading-5 text-slate-900">{user?.fullName || 'Personal account'}</h5>
+        </div>
       </div>
 
       <div className="flex flex-col">
-        {SideMenuData && SideMenuData.map((item, index) => (
+        <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">Workspace</p>
+        {SideMenuData.filter((item) => item.path !== '/logout').map((item) => (
           <button
-            key={`menu_${index}`}
-            className={`mb-2 flex w-full items-center gap-4 rounded-lg px-6 py-3 text-[15px] transition-colors duration-200 ${
-              activeMenu === item.label ? "bg-[#875cf5] text-white" : "text-gray-700 hover:bg-gray-100"
+            key={item.id}
+            aria-current={activeMenu === item.label ? 'page' : undefined}
+            className={`mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors duration-200 ${
+              activeMenu === item.label
+                ? "bg-violet-50 text-violet-700 ring-1 ring-violet-100"
+                : "text-slate-600 hover:bg-slate-50 hover:text-slate-950"
             }`}
             onClick={() => handleClick(item.path)}
           >
-            {item.icon && <item.icon className="text-xl" />}
+            {item.icon && <item.icon className={`text-lg ${activeMenu === item.label ? 'text-violet-600' : 'text-slate-400'}`} />}
             <span>{item.label}</span>
           </button>
         ))}
+      </div>
+
+      <div className="mt-auto border-t border-slate-100 pt-4">
+        {SideMenuData.filter((item) => item.path === '/logout').map((item) => (
+          <button
+            key={item.id}
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-slate-500 transition hover:bg-rose-50 hover:text-rose-600"
+            onClick={() => handleClick(item.path)}
+          >
+            {item.icon && <item.icon className="text-lg" />}
+            <span>{item.label}</span>
+          </button>
+        ))}
+        <p className="px-3 pt-3 text-[11px] text-slate-400">A clearer view of your money.</p>
       </div>
     </div>
   );

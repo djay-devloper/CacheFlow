@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "lint:features": "eslint src/App.jsx src/utils/apiPaths.js src/utils/data.js src/pages/Dashboard/Copilot.jsx src/pages/Dashboard/Reports.jsx src/pages/Dashboard/TransactionManager.jsx src/pages/Dashboard/Expense.jsx src/pages/Dashboard/Income.jsx",
+    "test:e2e": "playwright test",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -31,6 +33,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
+    "@playwright/test": "^1.56.1",
     "vite": "npm:rolldown-vite@7.2.5"
   },
   "overrides": {

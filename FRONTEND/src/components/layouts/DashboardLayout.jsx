@@ -32,7 +32,7 @@ const DashboardLayout = ({ activeMenu, children }) => {
     const closeSidebar = () => setIsSidebarOpen(false);
 
     return (
-        <div className="min-h-screen w-full overflow-x-hidden bg-[#fcfbfc]">
+        <div className="min-h-screen w-full overflow-x-hidden bg-[#f7f8fc]">
             <Navbar
                 activeMenu={activeMenu}
                 isSidebarOpen={isSidebarOpen}
@@ -40,18 +40,18 @@ const DashboardLayout = ({ activeMenu, children }) => {
                 onCloseSidebar={closeSidebar}
             />
 
-            <div className="flex min-h-[calc(100vh-61px)] w-full">
+            <div className="flex min-h-[calc(100vh-68px)] w-full">
                 {isSidebarOpen && (
                     <div
-                        className="fixed inset-0 z-30 bg-black/50 lg:hidden"
+                        className="fixed inset-0 z-30 bg-slate-950/35 backdrop-blur-[2px] lg:hidden"
                         onClick={closeSidebar}
                     />
                 )}
 
                 <aside
                     className={`
-                        fixed left-0 top-[61px] z-40 h-[calc(100vh-61px)] w-64 transition-transform duration-300 ease-in-out
-                        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+                        fixed left-0 top-[68px] z-40 h-[calc(100vh-68px)] w-64 transition-transform duration-300 ease-in-out
+                        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0
                     `}
                 >
                     <SideMenu
@@ -60,7 +60,7 @@ const DashboardLayout = ({ activeMenu, children }) => {
                     />
                 </aside>
 
-                <main className="flex-1 px-3 py-4 sm:px-5 lg:px-6">
+                <main className="min-w-0 flex-1 px-4 py-5 sm:px-7 lg:ml-64 lg:px-9 lg:py-8">
                     {children}
                 </main>
             </div>

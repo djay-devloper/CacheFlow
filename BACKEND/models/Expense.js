@@ -6,6 +6,14 @@ const ExpensesSchema = new mongoose.Schema({
     category: { type: String, required: true },
     amount: { type: Number, required: true },
     date: { type: Date, required: true },
+    note: { type: String, trim: true, maxlength: 500, default: '' },
+    tags: { type: [String], default: [] },
+    receipt: {
+        filename: { type: String },
+        originalName: { type: String },
+        contentType: { type: String },
+        uploadedAt: { type: Date },
+    },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Expense', ExpensesSchema);

@@ -9,9 +9,10 @@ import { API_PATHS } from '../../utils/apiPaths';
 import { UserContext } from '../../context/userContext';
 
 function Login() {
-const[email,setEmail]=React.useState("");
-const[password,setPassword]=React.useState("");
-const [error,setError]=React.useState("");
+const [email, setEmail] = React.useState("");
+const [password, setPassword] = React.useState("");
+const [error, setError] = React.useState("");
+const [isSubmitting, setIsSubmitting] = React.useState(false);
 const context = React.useContext(UserContext);
 const updateUser = context?.updateUser || (() => {});
 
@@ -31,20 +32,17 @@ const navigate = useNavigate();
           return;
         }
         setError("");
-
-
+        setIsSubmitting(true);
 
 
 
         //Login API Call
         try {
-            console.log('Attempting login with:', { email, password });
             const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN, {
                 email,
                 password,
             });
 
-            console.log('Login response:', response.data);
             const { token, user } = response.data;
 
             if (token) {
@@ -55,12 +53,13 @@ const navigate = useNavigate();
             }
         } catch (error) {
             console.error('Login error:', error);
-            console.error('Error response:', error.response?.data);
             if (error.response && error.response.data && error.response.data.message) {
                 setError(error.response.data.message);
             } else {
                 setError("Something went wrong. Please try again.");
             }
+        } finally {
+            setIsSubmitting(false);
         }
 
     // Close handler
@@ -71,10 +70,11 @@ const navigate = useNavigate();
 
   return (
     <AuthLayout>
-       <div className="lg:w-[70%] h-3/4 md:h-full flex flex-col justify-center">
-       <h3 className="text-3xl md:text-xl font-semibold  text-black">Welcome Back</h3>
-       <p className="text-xs text-slate-700 mt-[5px] mb-6">
-        Please enter your details to login.
+       <div className="flex flex-col justify-center">
+       <span className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-violet-600">Welcome back</span>
+       <h3 className="text-3xl font-semibold tracking-tight text-slate-950">Sign in to your account</h3>
+       <p className="mt-2 mb-7 text-sm text-slate-500">
+        Pick up where you left off with your finances.
        </p>
 
       <form onSubmit={handleLogin}>
@@ -94,14 +94,14 @@ const navigate = useNavigate();
           type="password"
           />
 
-          {error && <p className="text-red-500 text-xs pb-2.5">{error}</p>}
-          <button type="submit" className="btn-primary">
-            LOGIN
+          {error && <p role="alert" className="mb-3 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</p>}
+          <button type="submit" disabled={isSubmitting} className="btn-primary">
+            {isSubmitting ? 'Signing in…' : 'Sign in'}
           </button>
 
-          <p className="text-[13px] text-slate-800 mt-3">
+          <p className="mt-4 text-center text-sm text-slate-500">
             Don't have an account?{" "}
-            <Link className="font-medium text-primary underline" to="/signup">
+            <Link className="font-semibold text-violet-700 hover:text-violet-800" to="/signup">
               Sign Up
             </Link>
           </p>

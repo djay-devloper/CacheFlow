@@ -15,7 +15,7 @@ const SignUp = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const context = useContext(UserContext);
   const updateUser = context?.updateUser || (() => {});
@@ -42,6 +42,7 @@ const SignUp = () => {
     }
 
     setError("");
+    setIsSubmitting(true);
 
     try {
       let profileImageUrl = "";
@@ -76,15 +77,18 @@ const SignUp = () => {
       } else {
         setError("Something went wrong. Please try again.");
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <AuthLayout>
       <div className="lg:w-[100%] h-auto md:h-full md:mt-0 flex flex-col justify-center">
-        <h3 className="text-xl font-semibold  text-black">Create an Account</h3>
-        <p className="text-xs text-slate-700 mt-[5px] mb-6">
-          Please enter your details to sign up.
+        <span className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-violet-600">Get started</span>
+        <h3 className="text-3xl font-semibold tracking-tight text-slate-950">Create your account</h3>
+        <p className="mt-2 mb-6 text-sm text-slate-500">
+          A better view of your finances starts here.
         </p>
 
         <form onSubmit={handleSignUp}>
@@ -93,7 +97,7 @@ const SignUp = () => {
          
 
 
-          <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="mb-1 grid grid-cols-1 gap-x-4 sm:grid-cols-2">
             <Input
               value={fullName}
               onChange={({ target }) => setFullName(target.value)}
@@ -119,14 +123,14 @@ const SignUp = () => {
             type="password"
           />
 
-          {error && <p className="text-red-500 text-xs pb-2.5">{error}</p>}
-          <button type="submit" className="btn-primary">
-            SIGN UP
+          {error && <p role="alert" className="mb-3 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</p>}
+          <button type="submit" disabled={isSubmitting} className="btn-primary">
+            {isSubmitting ? 'Creating account…' : 'Create account'}
           </button>
 
-          <p className="text-[13px] text-slate-800 mt-3">
+          <p className="mt-4 text-center text-sm text-slate-500">
             Already have an account?{" "}
-            <Link className="font-medium text-primary underline" to="/login">
+            <Link className="font-semibold text-violet-700 hover:text-violet-800" to="/login">
               Login
             </Link>
           </p>
@@ -152,4 +156,3 @@ const SignUp = () => {
 };
 
 export default SignUp;
-

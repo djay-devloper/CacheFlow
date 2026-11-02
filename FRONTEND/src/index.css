@@ -1,67 +1,92 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @import "tailwindcss";
 
-@theme{
-  --font-display:"Poppins", "sans-serif";
+@theme {
+  --font-display: "Inter", "Avenir Next", "Segoe UI", sans-serif;
   --breakpoint-3xl: 1920px;
-  --color-primary:#875cf5;
-
+  --color-primary: #6d4aff;
 }
 
-@layer base{
+@layer base {
   * {
     box-sizing: border-box;
   }
 
-  html{
+  html {
     font-family: var(--font-display);
     -webkit-text-size-adjust: 100%;
-  }
-  
-  body{
-    background-color:#fcfbfc;
-    overflow-x:hidden;
-    margin: 0;
-    padding: 0;
-    min-width: 320px;
-  }
-  
-  #root{
-    min-height: 100vh;
-    width: 100%;
+    scroll-behavior: smooth;
+    background: #f7f8fc;
   }
 
-  img, svg {
+  body {
+    min-width: 320px;
+    min-height: 100vh;
+    margin: 0;
+    overflow-x: hidden;
+    color: #172033;
+    background: #f7f8fc;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    width: 100%;
+    min-height: 100vh;
+  }
+
+  img,
+  svg {
     display: block;
     max-width: 100%;
   }
 
-  label{
-    @apply block text-sm font-medium text-gray-800 mb-2;
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+
+  :focus-visible {
+    outline: 3px solid rgb(109 74 255 / 38%);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    color: #fff;
+    background: #6d4aff;
+  }
+
+  label {
+    @apply mb-2 block text-sm font-medium text-slate-700;
   }
 }
 
-.input-box{
-  @apply w-full flex items-center justify-between gap-2 px-4 py-3 bg-slate-100 border border-slate-200 rounded-lg text-sm text-gray-900 outline-none transition-all duration-200 focus-within:ring-2 focus-within:ring-violet-500/50 mb-6;
+.input-box {
+  @apply mb-5 flex w-full items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-all duration-200 focus-within:border-violet-400 focus-within:ring-4 focus-within:ring-violet-500/10;
 }
 
-.input-box input{
-  @apply flex-1 bg-transparent outline-none text-gray-900 placeholder-gray-400;
+.input-box input {
+  @apply flex-1 bg-transparent text-slate-900 outline-none placeholder:text-slate-400;
 }
 
-.input-box input::placeholder{
-  @apply text-gray-400;
+.btn-primary {
+  @apply mb-4 w-full rounded-xl bg-violet-600 px-4 py-3 text-base font-semibold text-white shadow-lg shadow-violet-600/20 transition-all duration-200 hover:-translate-y-0.5 hover:bg-violet-700 hover:shadow-xl hover:shadow-violet-600/25 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60;
 }
 
-.btn-primary{
-  @apply w-full py-3 px-4 text-base font-semibold text-white bg-gradient-to-r from-violet-500 to-purple-600 rounded-lg shadow-lg shadow-purple-500/30 transition-all duration-200 hover:shadow-xl hover:shadow-purple-500/40 active:scale-95 mb-4;
+.card {
+  @apply rounded-2xl border border-slate-200/80 bg-white shadow-[0_8px_30px_-20px_rgba(27,39,68,0.22)];
 }
 
-.card{
-  @apply bg-white rounded-lg shadow-gray-100 border border-gray-200/50;
-}
-
-.card-btn{
-  @apply flex items-center gap-3 text-[12px] font-medium text-gray-700 hover:text-purple-500 bg-gray-50 hover:bg-purple-50 px-4 py-1.5 rounded-lg border border-gray-200/50 cursor-pointer;
+.card-btn {
+  @apply inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700;
 }

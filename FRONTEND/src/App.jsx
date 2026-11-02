@@ -11,6 +11,8 @@ import Landing from './pages/Landing.jsx';
 import Home from './pages/Dashboard/Home.jsx';
 import Expense from './pages/Dashboard/Expense.jsx';
 import Income from './pages/Dashboard/Income.jsx';
+import Reports from './pages/Dashboard/Reports.jsx';
+import Copilot from './pages/Dashboard/Copilot.jsx';
 import UserProvider, { UserContext } from './context/userContext.jsx';
 
 
@@ -50,6 +52,8 @@ const App = () => {
             <Route path='/dashboard' element={<Home />} />
             <Route path='/expense' element={<Expense />} />
             <Route path='/income' element={<Income />} />
+            <Route path='/reports' element={<Reports />} />
+            <Route path='/copilot' element={<Copilot />} />
           </Routes>
         </div>
       </Router>
