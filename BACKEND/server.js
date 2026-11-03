@@ -59,8 +59,6 @@ app.use(express.urlencoded({ extended: false }));
         next(err);
     });
 
-     connectDB();
-    
      app.use("/api/v1/auth",authRoutes);
      app.use("/api/v1/income",incomeRoutes);
     app.use("/api/v1/expense",expenseRoutes);
@@ -76,7 +74,31 @@ app.use(express.urlencoded({ extended: false }));
 
 
 
-    const PORT = process.env.PORT || 8000;
-    app.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}`);
-    });
+const startServer = async () => {
+    try {
+        await connectDB();
+
+        const PORT = process.env.PORT || 8000;
+        const server = app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+        });
+        server.on('error', (error) => {
+            console.error('Failed to start API server:', error.message);
+            process.exitCode = 1;
+        });
+    } catch (error) {
+        console.error('MongoDB connection failed; API server was not started.');
+
+        for (const [host, server] of error.reason?.servers || []) {
+            console.error(`${host}: ${server.error?.message || 'connection failed'}`);
+        }
+
+        if (!error.reason?.servers?.size) {
+            console.error(error.message);
+        }
+
+        process.exitCode = 1;
+    }
+};
+
+startServer();

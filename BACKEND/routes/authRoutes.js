@@ -8,7 +8,7 @@ const { registerUser,
      updateUserProfile,
      updateProfileImage,
      } = require('../controllers/authController');
-const upload = require('../middleware/uploadMiddleware');
+const uploadProfileImage = require('../middleware/uploadMiddleware');
 
 const router = express.Router();
 
@@ -22,7 +22,7 @@ router.post('/login', loginUser);
 
  router.put('/profile', protect, updateUserProfile);
 
- router.post('/upload-image', protect, upload.single('image'), updateProfileImage);
+ router.post('/upload-image', protect, uploadProfileImage, updateProfileImage);
 
 
  

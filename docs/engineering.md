@@ -17,6 +17,7 @@ The Gemini API key is read only by the backend. Do not use a `VITE_` prefix for 
 - `GET /api/v1/reports`: monthly income, expenses, net cash flow, and expense categories for the current and previous 11 months, grouped in the app's Asia/Kolkata time zone.
 - `GET /api/v1/reports/download-excel`: the same report as an Excel workbook.
 - `POST /api/v1/copilot/ask`: Gemini-generated explanations grounded in the authenticated user's 12-month report.
+- `POST /api/v1/auth/upload-image`: authenticated JPEG/PNG profile photos, limited to 5 MB. Profile images use local disk storage, so production deployments with ephemeral filesystems should use persistent private object storage.
 
 Receipt downloads require authentication and ownership. Receipt uploads are limited to 5 MB and JPEG, PNG, WebP, or PDF. The current receipt store is local disk; production deployments with ephemeral filesystems should replace it with private object storage.
 

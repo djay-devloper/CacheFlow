@@ -25,7 +25,14 @@ exports.registerUser = async (req, res) => {
         }
 
         // Create the user
-        const user = await User.create({ fullName, email, password, profileImageUrl });
+        const user = await User.create({
+            fullName,
+            email,
+            password,
+            profileImageUrl: typeof profileImageUrl === 'string' && profileImageUrl.trim()
+                ? profileImageUrl.trim()
+                : '/default-avatar.svg',
+        });
 
         res.status(201).json({
             id: user._id,

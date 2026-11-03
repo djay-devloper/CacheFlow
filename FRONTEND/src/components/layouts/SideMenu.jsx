@@ -47,6 +47,12 @@ const SideMenu = ({ activeMenu, onMenuClick, className = '' }) => {
   const handleProfileSave = async (event) => {
     event.preventDefault();
     setProfileError('');
+
+    if (profileImage && profileImage.size > 5 * 1024 * 1024) {
+      setProfileError('Choose a profile photo that is 5 MB or smaller.');
+      return;
+    }
+
     setIsSavingProfile(true);
     try {
       const response = await axiosInstance.put(API_PATHS.AUTH.UPDATE_PROFILE, profileData);
@@ -59,6 +65,7 @@ const SideMenu = ({ activeMenu, onMenuClick, className = '' }) => {
         try {
           const imageResponse = await axiosInstance.post(API_PATHS.IMAGE.UPLOAD_IMAGE, formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
+            timeout: 60000,
           });
           updatedUser = imageResponse.data.user || {
             ...updatedUser,
@@ -67,7 +74,11 @@ const SideMenu = ({ activeMenu, onMenuClick, className = '' }) => {
           updateUser(updatedUser);
         } catch (imageError) {
           console.error('Profile details were saved but profile photo upload failed:', imageError);
-          setProfileError(imageError.response?.data?.message || 'Your details were saved, but the profile photo could not be uploaded.');
+          const message = imageError.response?.data?.message
+            || (imageError.code === 'ECONNABORTED'
+              ? 'The profile photo upload timed out. Try a smaller image or try again.'
+              : 'The profile photo could not be uploaded. Check your connection and try again.');
+          setProfileError(`Your details were saved, but ${message.charAt(0).toLowerCase()}${message.slice(1)}`);
           return;
         }
       }
@@ -178,7 +189,7 @@ const SideMenu = ({ activeMenu, onMenuClick, className = '' }) => {
                 />
                 <label className="min-w-0 flex-1 text-sm font-medium text-slate-700">
                   Profile photo
-                  <span className="mt-1 block text-xs font-normal text-slate-500">Choose an image to personalize your account.</span>
+                  <span className="mt-1 block text-xs font-normal text-slate-500">JPEG or PNG, up to 5 MB.</span>
                   <input
                     type="file"
                     accept="image/jpeg,image/png,image/jpg"

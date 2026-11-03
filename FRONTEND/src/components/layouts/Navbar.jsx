@@ -49,11 +49,11 @@ const Navbar = ({ activeMenu, isSidebarOpen, onToggleSidebar, onCloseSidebar }) 
             <p className="text-xs text-slate-500">Personal workspace</p>
           </div>
           <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-violet-100 text-sm font-semibold text-violet-700 ring-2 ring-violet-100">
-            {user?.profileImageUrl ? (
-              <img src={user.profileImageUrl} alt="" className="h-full w-full object-cover" />
-            ) : (
-              (user?.fullName || 'C').trim().charAt(0).toUpperCase()
-            )}
+            <img
+              src={user?.profileImageUrl || '/default-avatar.svg'}
+              alt=""
+              className="h-full w-full object-cover"
+            />
           </div>
         </div>
     </header>

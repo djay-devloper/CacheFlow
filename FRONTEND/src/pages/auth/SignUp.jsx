@@ -45,7 +45,7 @@ const SignUp = () => {
     setIsSubmitting(true);
 
     try {
-      let profileImageUrl = "";
+      let profileImageUrl;
       
       // Upload profile image if selected
       if (profilePic) {
@@ -58,12 +58,14 @@ const SignUp = () => {
       }
 
       // Register user
-      const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, {
+      const registrationData = {
         fullName,
         email,
         password,
-        profileImageUrl: profileImageUrl,
-      });
+      };
+      if (profileImageUrl) registrationData.profileImageUrl = profileImageUrl;
+
+      const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER, registrationData);
 
       const { token, user } = response.data;
       if (token) {
