@@ -9,7 +9,17 @@ import SideMenu from './SideMenu';
 const DashboardLayout = ({ activeMenu, children }) => {
     const { user, updateUser } = useContext(UserContext);
     const navigate = useNavigate();
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(
+        () => window.matchMedia('(min-width: 1024px)').matches
+    );
+
+    useEffect(() => {
+        const desktopQuery = window.matchMedia('(min-width: 1024px)');
+        const syncSidebarWithViewport = (event) => setIsSidebarOpen(event.matches);
+
+        desktopQuery.addEventListener('change', syncSidebarWithViewport);
+        return () => desktopQuery.removeEventListener('change', syncSidebarWithViewport);
+    }, []);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -32,7 +42,7 @@ const DashboardLayout = ({ activeMenu, children }) => {
     const closeSidebar = () => setIsSidebarOpen(false);
 
     return (
-        <div className="min-h-screen w-full overflow-x-hidden bg-[#f7f8fc]">
+        <div className="min-h-screen w-full overflow-x-clip bg-[#f7f8fc]">
             <Navbar
                 activeMenu={activeMenu}
                 isSidebarOpen={isSidebarOpen}
@@ -40,19 +50,23 @@ const DashboardLayout = ({ activeMenu, children }) => {
                 onCloseSidebar={closeSidebar}
             />
 
-            <div className="flex min-h-[calc(100vh-68px)] w-full">
+            <div className="min-h-[calc(100vh-68px)] w-full">
                 {isSidebarOpen && (
                     <div
-                        className="fixed inset-0 z-30 bg-slate-950/35 backdrop-blur-[2px] lg:hidden"
+                        className="fixed inset-x-0 bottom-0 top-[68px] z-30 bg-slate-950/35 backdrop-blur-[2px] lg:hidden"
                         onClick={closeSidebar}
+                        aria-hidden="true"
                     />
                 )}
 
                 <aside
-                    className={`
-                        fixed left-0 top-[68px] z-40 h-[calc(100vh-68px)] w-64 transition-transform duration-300 ease-in-out
-                        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0
-                    `}
+                    id="primary-navigation"
+                    aria-label="Primary navigation"
+                    aria-hidden={!isSidebarOpen}
+                    inert={!isSidebarOpen}
+                    className={`fixed left-0 top-[68px] z-40 h-[calc(100vh-68px)] w-64 transition-transform duration-300 ease-in-out ${
+                        isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                    }`}
                 >
                     <SideMenu
                         activeMenu={activeMenu}
@@ -60,7 +74,9 @@ const DashboardLayout = ({ activeMenu, children }) => {
                     />
                 </aside>
 
-                <main className="min-w-0 flex-1 px-4 py-5 sm:px-7 lg:ml-64 lg:px-9 lg:py-8">
+                <main className={`min-w-0 px-4 py-6 transition-[margin] duration-300 sm:px-7 lg:px-9 lg:py-8 ${
+                    isSidebarOpen ? 'lg:ml-64' : 'lg:ml-0'
+                }`}>
                     {children}
                 </main>
             </div>

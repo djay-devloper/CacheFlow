@@ -48,12 +48,12 @@ function Home() {
 
   return (
     <DashboardLayout activeMenu="Dashboard">
-      <div className="mx-auto my-2 max-w-7xl">
-        <header className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="page-frame space-y-6">
+        <header className="page-header mb-0">
           <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-violet-600">Your overview</p>
-            <h1 className="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">Your money, in focus.</h1>
-            <p className="mt-2 text-sm text-slate-500">A clear view of what’s coming in and going out.</p>
+            <p className="page-eyebrow">Your overview</p>
+            <h1 className="page-title">Your money, in focus.</h1>
+            <p className="page-description">A clear view of what’s coming in and going out.</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <button type="button" onClick={() => navigate('/copilot')} className="card-btn border-violet-100 bg-violet-50 text-violet-700 hover:bg-violet-100">Ask AI copilot</button>
@@ -64,11 +64,11 @@ function Home() {
         {error && <p role="alert" className="mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>}
 
         {loading && !dashboardData ? (
-          <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
             {[1, 2, 3].map((item) => <div key={item} className="card h-28 animate-pulse bg-slate-100" />)}
           </div>
         ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
           <InfoCard
             icon={<IoMdCard />}
             label="Total balance"
@@ -90,7 +90,7 @@ function Home() {
          </div>
         )}
 
-        <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
           <RecentTransactions
             transactions={dashboardData?.lastTransactions || []}
             onSeeMore={() => navigate('/expense')}
@@ -102,7 +102,7 @@ function Home() {
           />
         </div>
 
-        <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
           <ExpensesList
             expenses={dashboardData?.last30DaysExpense?.transactions || []}
             onSeeMore={() => navigate('/expense')}
@@ -112,7 +112,7 @@ function Home() {
           />
         </div>
 
-        <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
           <IncomeList
             income={dashboardData?.last60DaysIncome}
             onSeeMore={() => navigate('/income')}

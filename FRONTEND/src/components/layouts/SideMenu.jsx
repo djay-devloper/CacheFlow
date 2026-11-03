@@ -1,16 +1,20 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { SideMenuData } from '../../utils/data';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../context/userContext';
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
-import { LuCircleDollarSign, LuUpload } from 'react-icons/lu';
+import { LuPencil, LuUpload, LuX } from 'react-icons/lu';
 
 const SideMenu = ({ activeMenu, onMenuClick, className = '' }) => {
   const { user, clearUser, updateUser } = useContext(UserContext);
   const navigate = useNavigate();
-  const fileInputRef = useRef(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const [isProfileEditorOpen, setIsProfileEditorOpen] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [profileError, setProfileError] = useState('');
+  const [profileData, setProfileData] = useState({ fullName: '', email: '', phone: '' });
+  const [profileImage, setProfileImage] = useState(null);
 
   const handleClick = (route) => {
     if (route === "/logout") {
@@ -29,31 +33,51 @@ const SideMenu = ({ activeMenu, onMenuClick, className = '' }) => {
     navigate("/login");
   };
 
-  const handleProfileImageUpload = async (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const openProfileEditor = () => {
+    setProfileData({
+      fullName: user?.fullName || '',
+      email: user?.email || '',
+      phone: user?.phone || '',
+    });
+    setProfileImage(null);
+    setProfileError('');
+    setIsProfileEditorOpen(true);
+  };
 
-    const formData = new FormData();
-    formData.append('image', file);
-
+  const handleProfileSave = async (event) => {
+    event.preventDefault();
+    setProfileError('');
+    setIsSavingProfile(true);
     try {
-      setIsUploading(true);
-      const response = await axiosInstance.post(API_PATHS.IMAGE.UPLOAD_IMAGE, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const response = await axiosInstance.put(API_PATHS.AUTH.UPDATE_PROFILE, profileData);
+      let updatedUser = response.data.user;
+      updateUser(updatedUser);
 
-      const uploadedImageUrl = response?.data?.imageUrl;
-      if (uploadedImageUrl) {
-        updateUser({ ...user, profileImageUrl: uploadedImageUrl });
+      if (profileImage) {
+        const formData = new FormData();
+        formData.append('image', profileImage);
+        try {
+          const imageResponse = await axiosInstance.post(API_PATHS.IMAGE.UPLOAD_IMAGE, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          });
+          updatedUser = imageResponse.data.user || {
+            ...updatedUser,
+            profileImageUrl: imageResponse.data.imageUrl,
+          };
+          updateUser(updatedUser);
+        } catch (imageError) {
+          console.error('Profile details were saved but profile photo upload failed:', imageError);
+          setProfileError(imageError.response?.data?.message || 'Your details were saved, but the profile photo could not be uploaded.');
+          return;
+        }
       }
+
+      setIsProfileEditorOpen(false);
     } catch (error) {
-      console.error('Failed to upload profile image:', error);
-      alert('Profile image upload failed. Please try again.');
+      console.error('Failed to update profile:', error);
+      setProfileError(error.response?.data?.message || 'Could not save your profile. Please try again.');
     } finally {
-      setIsUploading(false);
-      event.target.value = '';
+      setIsSavingProfile(false);
     }
   };
 
@@ -61,39 +85,25 @@ const SideMenu = ({ activeMenu, onMenuClick, className = '' }) => {
 
   return (
     <div className={`flex h-full w-64 flex-col border-r border-slate-200/70 bg-white p-4 ${className}`}>
-      <div className="mb-7 flex items-center gap-3 px-2 pt-2">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-600 text-white shadow-md shadow-violet-600/20">
-          <LuCircleDollarSign className="text-2xl" />
-        </div>
-        <div className="relative">
+      <div className="mb-7 px-1 pt-1">
+        <button
+          type="button"
+          onClick={openProfileEditor}
+          className="group flex w-full items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-3 text-left transition hover:border-violet-200 hover:bg-violet-50/60 focus-visible:outline-violet-500"
+          aria-label="Edit profile and account settings"
+        >
           <img
             src={profileImageSrc}
-            alt="Profile Image"
-            className="h-10 w-10 rounded-full bg-slate-100 object-cover ring-2 ring-slate-100"
+            alt=""
+            className="h-10 w-10 shrink-0 rounded-full bg-white object-cover ring-2 ring-white"
           />
-
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border border-white bg-violet-600 text-white shadow-sm transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-70"
-            aria-label="Upload profile picture"
-            disabled={isUploading}
-          >
-            {isUploading ? <span className="text-[9px] font-bold">...</span> : <LuUpload className="text-[10px]" />}
-          </button>
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleProfileImageUpload}
-          />
-        </div>
-        <div className="min-w-0">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">CacheFlow</p>
-          <h5 className="truncate text-sm font-semibold leading-5 text-slate-900">{user?.fullName || 'Personal account'}</h5>
-        </div>
+          <span className="min-w-0 flex-1">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Personal account</p>
+            <span className="block truncate text-sm font-semibold leading-5 text-slate-900">{user?.fullName || 'Your account'}</span>
+            <span className="block truncate text-xs text-slate-500">{user?.email || 'Add an email address'}</span>
+          </span>
+          <LuPencil className="shrink-0 text-sm text-slate-400 transition group-hover:text-violet-600" aria-hidden="true" />
+        </button>
       </div>
 
       <div className="flex flex-col">
@@ -128,6 +138,116 @@ const SideMenu = ({ activeMenu, onMenuClick, className = '' }) => {
         ))}
         <p className="px-3 pt-3 text-[11px] text-slate-400">A clearer view of your money.</p>
       </div>
+
+      {isProfileEditorOpen && createPortal(
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/40 p-4 backdrop-blur-sm"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !isSavingProfile) setIsProfileEditorOpen(false);
+          }}
+        >
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="profile-editor-title"
+            className="w-full max-w-lg overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl"
+          >
+            <div className="flex items-start justify-between border-b border-slate-100 px-6 py-5">
+              <div>
+                <p className="page-eyebrow">Account settings</p>
+                <h2 id="profile-editor-title" className="text-xl font-semibold tracking-tight text-slate-950">Edit your profile</h2>
+                <p className="mt-1 text-sm text-slate-500">Update your contact details and profile photo.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsProfileEditorOpen(false)}
+                disabled={isSavingProfile}
+                aria-label="Close profile settings"
+                className="rounded-xl p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50"
+              >
+                <LuX />
+              </button>
+            </div>
+
+            <form onSubmit={handleProfileSave} className="space-y-4 p-6">
+              <div className="flex items-center gap-4 rounded-2xl bg-slate-50 p-4">
+                <img
+                  src={profileImageSrc}
+                  alt=""
+                  className="h-14 w-14 rounded-full bg-white object-cover ring-2 ring-white"
+                />
+                <label className="min-w-0 flex-1 text-sm font-medium text-slate-700">
+                  Profile photo
+                  <span className="mt-1 block text-xs font-normal text-slate-500">Choose an image to personalize your account.</span>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/jpg"
+                    onChange={(event) => setProfileImage(event.target.files?.[0] || null)}
+                    className="mt-2 block w-full text-xs text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-violet-100 file:px-3 file:py-2 file:font-semibold file:text-violet-700 hover:file:bg-violet-200"
+                  />
+                </label>
+                <LuUpload className="hidden shrink-0 text-violet-600 sm:block" aria-hidden="true" />
+              </div>
+
+              <label className="block text-sm font-medium text-slate-700">
+                Full name
+                <input
+                  required
+                  maxLength="100"
+                  autoComplete="name"
+                  value={profileData.fullName}
+                  onChange={(event) => setProfileData((current) => ({ ...current, fullName: event.target.value }))}
+                  className="field-control"
+                />
+              </label>
+
+              <label className="block text-sm font-medium text-slate-700">
+                Email address
+                <input
+                  required
+                  type="email"
+                  maxLength="254"
+                  autoComplete="email"
+                  value={profileData.email}
+                  onChange={(event) => setProfileData((current) => ({ ...current, email: event.target.value }))}
+                  className="field-control"
+                />
+                <span className="mt-1 block text-xs font-normal text-slate-500">Used for account communication and sign-in.</span>
+              </label>
+
+              <label className="block text-sm font-medium text-slate-700">
+                Phone number <span className="font-normal text-slate-400">(optional)</span>
+                <input
+                  type="tel"
+                  maxLength="25"
+                  autoComplete="tel"
+                  value={profileData.phone}
+                  onChange={(event) => setProfileData((current) => ({ ...current, phone: event.target.value }))}
+                  placeholder="+1 555 123 4567"
+                  className="field-control"
+                />
+              </label>
+
+              {profileError && <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{profileError}</p>}
+
+              <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={() => setIsProfileEditorOpen(false)}
+                  disabled={isSavingProfile}
+                  className="card-btn justify-center"
+                >
+                  Cancel
+                </button>
+                <button type="submit" disabled={isSavingProfile} className="button-primary">
+                  {isSavingProfile ? 'Saving profile…' : 'Save changes'}
+                </button>
+              </div>
+            </form>
+          </section>
+        </div>,
+        document.body
+      )}
     </div>
   );
 };

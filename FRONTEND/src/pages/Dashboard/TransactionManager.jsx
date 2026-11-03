@@ -250,70 +250,71 @@ const TransactionManager = ({ type }) => {
 
   return (
     <DashboardLayout activeMenu={type === 'expense' ? 'Expense' : 'Income'}>
-      <section className="mx-auto w-full max-w-7xl py-6">
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <section className="page-frame">
+        <div className="page-header">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{config.title}</h1>
-            <p className="mt-1 text-sm text-gray-500">Search, filter, edit, and export your {config.title.toLowerCase()}.</p>
+            <p className="page-eyebrow">Transaction management</p>
+            <h1 className="page-title">{config.title}</h1>
+            <p className="page-description">Search, filter, edit, and export your {config.title.toLowerCase()}.</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <button type="button" onClick={handleDownload} className="card-btn">
               <LuDownload /> Export Excel
             </button>
-            <button type="button" onClick={openAddForm} className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700">
+            <button type="button" onClick={openAddForm} className="button-primary">
               <LuPlus /> Add {config.singular}
             </button>
           </div>
         </div>
 
-        <div className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="card p-5">
-            <p className="text-sm text-gray-500">Matching transactions</p>
-            <p className="mt-1 text-2xl font-bold text-gray-900">{pagination.total}</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Matching transactions</p>
+            <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">{pagination.total}</p>
           </div>
           <div className="card p-5">
-            <p className="text-sm text-gray-500">Total for current filters</p>
-            <p className="mt-1 text-2xl font-bold text-purple-700">{addThousandSeparators(summaryTotal)}</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Total for current filters</p>
+            <p className="mt-2 text-2xl font-semibold tracking-tight text-violet-700">{addThousandSeparators(summaryTotal)}</p>
           </div>
         </div>
 
-        <form key={JSON.stringify(filters)} onSubmit={onFilterSubmit} className="card mb-5 grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 lg:grid-cols-5">
-          <label className="text-sm text-gray-600">
+        <form key={JSON.stringify(filters)} onSubmit={onFilterSubmit} className="card mb-6 grid grid-cols-1 items-end gap-4 p-5 sm:grid-cols-2 lg:grid-cols-5">
+          <label className="text-sm text-slate-600">
             Search
-            <input name="search" defaultValue={filters.search} maxLength="100" placeholder="Category, note, or tag" className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-gray-900" />
+            <input name="search" defaultValue={filters.search} maxLength="100" placeholder="Category, note, or tag" className="field-control" />
           </label>
-          <label className="text-sm text-gray-600">
+          <label className="text-sm text-slate-600">
             Category / source
-            <input name="category" defaultValue={filters.category} maxLength="80" placeholder={type === 'expense' ? 'e.g. Food' : 'e.g. Salary'} className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-gray-900" />
+            <input name="category" defaultValue={filters.category} maxLength="80" placeholder={type === 'expense' ? 'e.g. Food' : 'e.g. Salary'} className="field-control" />
           </label>
-          <label className="text-sm text-gray-600">
+          <label className="text-sm text-slate-600">
             From
-            <input name="from" type="date" defaultValue={filters.from} className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-gray-900" />
+            <input name="from" type="date" defaultValue={filters.from} className="field-control" />
           </label>
-          <label className="text-sm text-gray-600">
+          <label className="text-sm text-slate-600">
             To
-            <input name="to" type="date" defaultValue={filters.to} className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-gray-900" />
+            <input name="to" type="date" defaultValue={filters.to} className="field-control" />
           </label>
           <div className="flex items-end gap-2">
-            <button type="submit" className="flex-1 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700">Apply</button>
-            <button type="button" onClick={() => { setFilters({ search: '', category: '', from: '', to: '' }); setPage(1); }} className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">Clear</button>
+            <button type="submit" className="button-primary flex-1">Apply</button>
+            <button type="button" onClick={() => { setFilters({ search: '', category: '', from: '', to: '' }); setPage(1); }} className="card-btn">Clear</button>
           </div>
         </form>
 
-        {error && <p role="alert" className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
+        {error && <p role="alert" className="mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>}
 
         <div className="card overflow-hidden">
           {loading ? (
-            <div className="p-10 text-center text-sm text-gray-500">Loading transactions…</div>
+            <div className="p-10 text-center text-sm text-slate-500">Loading transactions…</div>
           ) : transactions.length === 0 ? (
             <div className="p-10 text-center">
-              <p className="font-medium text-gray-700">No {config.title.toLowerCase()} match these filters.</p>
-              <p className="mt-1 text-sm text-gray-500">Add a transaction or adjust your search.</p>
+              <p className="font-medium text-slate-800">No {config.title.toLowerCase()} match these filters.</p>
+              <p className="mt-1 text-sm text-slate-500">Add a transaction or adjust your search.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[760px] text-left text-sm">
-                <thead className="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+                <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                   <tr>
                     <th className="px-5 py-3">{type === 'expense' ? 'Category' : 'Source'}</th>
                     <th className="px-5 py-3">Date</th>
@@ -323,37 +324,37 @@ const TransactionManager = ({ type }) => {
                     <th className="px-5 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-slate-100">
                   {transactions.map((transaction) => (
-                    <tr key={transaction._id} className="hover:bg-gray-50">
-                      <td className="px-5 py-4 font-medium text-gray-900">
+                    <tr key={transaction._id} className="transition-colors hover:bg-slate-50">
+                      <td className="px-5 py-4 font-medium text-slate-900">
                         <span className="mr-2">{transaction.icon || '•'}</span>
                         {transaction[config.field]}
                       </td>
-                      <td className="whitespace-nowrap px-5 py-4 text-gray-600">{formatDateTimeInIndia(transaction.date)}</td>
+                      <td className="whitespace-nowrap px-5 py-4 text-slate-600">{formatDateTimeInIndia(transaction.date)}</td>
                       <td className="max-w-64 px-5 py-4">
-                        {transaction.note && <p className="truncate text-gray-700" title={transaction.note}>{transaction.note}</p>}
+                        {transaction.note && <p className="truncate text-slate-700" title={transaction.note}>{transaction.note}</p>}
                         {(transaction.tags || []).length > 0 && (
                           <div className="mt-1 flex flex-wrap gap-1">
-                            {transaction.tags.map((tag) => <span key={tag} className="rounded-full bg-purple-50 px-2 py-0.5 text-xs text-purple-700">{tag}</span>)}
+                            {transaction.tags.map((tag) => <span key={tag} className="rounded-full bg-violet-50 px-2 py-0.5 text-xs text-violet-700">{tag}</span>)}
                           </div>
                         )}
-                        {!transaction.note && !(transaction.tags || []).length && <span className="text-gray-400">—</span>}
+                        {!transaction.note && !(transaction.tags || []).length && <span className="text-slate-400">—</span>}
                       </td>
-                      <td className={`whitespace-nowrap px-5 py-4 text-right font-semibold ${type === 'expense' ? 'text-red-600' : 'text-green-600'}`}>
+                      <td className={`whitespace-nowrap px-5 py-4 text-right font-semibold ${type === 'expense' ? 'text-rose-600' : 'text-emerald-600'}`}>
                         {type === 'expense' ? '−' : '+'}{addThousandSeparators(transaction.amount)}
                       </td>
                       <td className="px-5 py-4">
                         {transaction.receipt?.filename ? (
-                          <button type="button" onClick={() => handleReceiptDownload(transaction)} className="inline-flex items-center gap-1 text-purple-700 hover:underline" title={transaction.receipt.originalName}>
+                          <button type="button" onClick={() => handleReceiptDownload(transaction)} className="inline-flex items-center gap-1 text-violet-700 hover:underline" title={transaction.receipt.originalName}>
                             <LuReceipt /> Download
                           </button>
-                        ) : <span className="text-gray-400">—</span>}
+                        ) : <span className="text-slate-400">—</span>}
                       </td>
                       <td className="px-5 py-4">
                         <div className="flex justify-end gap-2">
-                          <button type="button" onClick={() => openEditForm(transaction)} aria-label={`Edit ${config.singular}`} className="rounded p-2 text-gray-600 hover:bg-purple-50 hover:text-purple-700"><LuPencil /></button>
-                          <button type="button" onClick={() => handleDelete(transaction)} disabled={deletingId === transaction._id} aria-label={`Delete ${config.singular}`} className="rounded p-2 text-gray-600 hover:bg-red-50 hover:text-red-700 disabled:opacity-50"><LuTrash2 /></button>
+                          <button type="button" onClick={() => openEditForm(transaction)} aria-label={`Edit ${config.singular}`} className="rounded-lg p-2 text-slate-500 transition hover:bg-violet-50 hover:text-violet-700"><LuPencil /></button>
+                          <button type="button" onClick={() => handleDelete(transaction)} disabled={deletingId === transaction._id} aria-label={`Delete ${config.singular}`} className="rounded-lg p-2 text-slate-500 transition hover:bg-rose-50 hover:text-rose-700 disabled:opacity-50"><LuTrash2 /></button>
                         </div>
                       </td>
                     </tr>
@@ -363,57 +364,57 @@ const TransactionManager = ({ type }) => {
             </div>
           )}
 
-          <div className="flex items-center justify-between border-t border-gray-100 px-5 py-4 text-sm">
-            <span className="text-gray-500">Page {page} of {Math.max(pagination.pages, 1)}</span>
+          <div className="flex items-center justify-between border-t border-slate-100 px-5 py-4 text-sm">
+            <span className="text-slate-500">Page {page} of {Math.max(pagination.pages, 1)}</span>
             <div className="flex gap-2">
-              <button type="button" onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={page <= 1 || loading} className="rounded-lg border border-gray-200 px-3 py-1.5 disabled:opacity-40">Previous</button>
-              <button type="button" onClick={() => setPage((current) => Math.min(pagination.pages, current + 1))} disabled={page >= pagination.pages || loading} className="rounded-lg border border-gray-200 px-3 py-1.5 disabled:opacity-40">Next</button>
+              <button type="button" onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={page <= 1 || loading} className="card-btn px-3 py-1.5 disabled:opacity-40">Previous</button>
+              <button type="button" onClick={() => setPage((current) => Math.min(pagination.pages, current + 1))} disabled={page >= pagination.pages || loading} className="card-btn px-3 py-1.5 disabled:opacity-40">Next</button>
             </div>
           </div>
         </div>
 
         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="presentation">
-            <div role="dialog" aria-modal="true" aria-labelledby="transaction-form-title" className="relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
-              <button type="button" onClick={closeForm} aria-label="Close dialog" className="absolute right-4 top-3 text-2xl text-gray-500 hover:text-gray-900">×</button>
-              <h2 id="transaction-form-title" className="mb-1 text-xl font-semibold text-gray-900">{editingTransaction ? 'Edit' : 'Add'} {config.singular}</h2>
-              <p className="mb-5 text-sm text-gray-500">Record details and optionally attach a receipt.</p>
+            <div role="dialog" aria-modal="true" aria-labelledby="transaction-form-title" className="relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
+              <button type="button" onClick={closeForm} aria-label="Close dialog" className="absolute right-4 top-3 rounded-lg px-2 text-2xl text-slate-400 transition hover:bg-slate-100 hover:text-slate-900">×</button>
+              <h2 id="transaction-form-title" className="mb-1 text-xl font-semibold tracking-tight text-slate-950">{editingTransaction ? 'Edit' : 'Add'} {config.singular}</h2>
+              <p className="mb-5 text-sm text-slate-500">Record details and optionally attach a receipt.</p>
               <form onSubmit={handleSave} className="space-y-4">
                 <div>
-                  <span className="mb-2 block text-sm font-medium text-gray-700">Icon</span>
+                  <span className="mb-2 block text-sm font-medium text-slate-700">Icon</span>
                   <div className="grid grid-cols-8 gap-2">
                     {config.icons.map((icon) => (
-                      <button key={icon} type="button" onClick={() => setFormData((current) => ({ ...current, icon }))} aria-label={`Choose ${icon}`} className={`rounded-lg border p-2 text-xl ${formData.icon === icon ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:bg-gray-50'}`}>{icon}</button>
+                      <button key={icon} type="button" onClick={() => setFormData((current) => ({ ...current, icon }))} aria-label={`Choose ${icon}`} className={`rounded-xl border p-2 text-xl transition ${formData.icon === icon ? 'border-violet-300 bg-violet-50' : 'border-slate-200 hover:bg-slate-50'}`}>{icon}</button>
                     ))}
                   </div>
                 </div>
-                <label className="block text-sm text-gray-700">
+                <label className="block text-sm text-slate-700">
                   {type === 'expense' ? 'Category' : 'Source'}
-                  <input required maxLength="80" value={formData[config.field]} onChange={(event) => setFormData((current) => ({ ...current, [config.field]: event.target.value }))} placeholder={type === 'expense' ? 'e.g. Food, transport' : 'e.g. Salary, freelance'} className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2" />
+                  <input required maxLength="80" value={formData[config.field]} onChange={(event) => setFormData((current) => ({ ...current, [config.field]: event.target.value }))} placeholder={type === 'expense' ? 'e.g. Food, transport' : 'e.g. Salary, freelance'} className="field-control" />
                 </label>
-                <label className="block text-sm text-gray-700">
+                <label className="block text-sm text-slate-700">
                   Amount
-                  <input required type="number" min="0.01" step="0.01" value={formData.amount} onChange={(event) => setFormData((current) => ({ ...current, amount: event.target.value }))} className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2" />
+                  <input required type="number" min="0.01" step="0.01" value={formData.amount} onChange={(event) => setFormData((current) => ({ ...current, amount: event.target.value }))} className="field-control" />
                 </label>
-                <label className="block text-sm text-gray-700">
+                <label className="block text-sm text-slate-700">
                   Date and time
-                  <input required type="datetime-local" value={formData.date} onChange={(event) => setFormData((current) => ({ ...current, date: event.target.value }))} className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2" />
+                  <input required type="datetime-local" value={formData.date} onChange={(event) => setFormData((current) => ({ ...current, date: event.target.value }))} className="field-control" />
                 </label>
-                <label className="block text-sm text-gray-700">
+                <label className="block text-sm text-slate-700">
                   Note
-                  <textarea maxLength="500" rows="2" value={formData.note} onChange={(event) => setFormData((current) => ({ ...current, note: event.target.value }))} placeholder="Optional details" className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2" />
+                  <textarea maxLength="500" rows="2" value={formData.note} onChange={(event) => setFormData((current) => ({ ...current, note: event.target.value }))} placeholder="Optional details" className="field-control" />
                 </label>
-                <label className="block text-sm text-gray-700">
-                  Tags <span className="text-gray-400">(comma-separated, up to 10)</span>
-                  <input value={formData.tags} onChange={(event) => setFormData((current) => ({ ...current, tags: event.target.value }))} placeholder="work, recurring" className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2" />
+                <label className="block text-sm text-slate-700">
+                  Tags <span className="text-slate-400">(comma-separated, up to 10)</span>
+                  <input value={formData.tags} onChange={(event) => setFormData((current) => ({ ...current, tags: event.target.value }))} placeholder="work, recurring" className="field-control" />
                 </label>
-                <label className="block text-sm text-gray-700">
-                  Receipt <span className="text-gray-400">(JPEG, PNG, WebP, or PDF; max 5 MB)</span>
-                  <input type="file" accept="image/jpeg,image/png,image/webp,application/pdf" onChange={(event) => setReceiptFile(event.target.files?.[0] || null)} className="mt-1 block w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-purple-50 file:px-3 file:py-2 file:text-purple-700" />
-                  {editingTransaction?.receipt?.originalName && <span className="mt-1 block text-xs text-gray-500">Current receipt: {editingTransaction.receipt.originalName}</span>}
+                <label className="block text-sm text-slate-700">
+                  Receipt <span className="text-slate-400">(JPEG, PNG, WebP, or PDF; max 5 MB)</span>
+                  <input type="file" accept="image/jpeg,image/png,image/webp,application/pdf" onChange={(event) => setReceiptFile(event.target.files?.[0] || null)} className="mt-1 block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-violet-50 file:px-3 file:py-2 file:text-violet-700" />
+                  {editingTransaction?.receipt?.originalName && <span className="mt-1 block text-xs text-slate-500">Current receipt: {editingTransaction.receipt.originalName}</span>}
                 </label>
-                {formError && <p role="alert" className="text-sm text-red-600">{formError}</p>}
-                <button type="submit" disabled={saving} className="w-full rounded-lg bg-purple-600 px-4 py-3 font-semibold text-white hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-60">{saving ? 'Saving…' : editingTransaction ? 'Save changes' : `Add ${config.singular}`}</button>
+                {formError && <p role="alert" className="text-sm text-rose-600">{formError}</p>}
+                <button type="submit" disabled={saving} className="button-primary w-full py-3">{saving ? 'Saving…' : editingTransaction ? 'Save changes' : `Add ${config.singular}`}</button>
               </form>
             </div>
           </div>

@@ -90,6 +90,50 @@ exports.getUserInfo = async (req, res) => {
  }
 };
 
+exports.updateUserProfile = async (req, res) => {
+  const body = req.body || {};
+  const fullName = typeof body.fullName === 'string' ? body.fullName.trim() : '';
+  const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
+  const phone = typeof body.phone === 'string' ? body.phone.trim() : '';
+
+  if (!fullName || fullName.length > 100) {
+    return res.status(400).json({ message: 'Name must be between 1 and 100 characters.' });
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
+    return res.status(400).json({ message: 'Enter a valid email address.' });
+  }
+  if (phone && (!/^[+()\d\s.-]{7,25}$/.test(phone) || phone.replace(/\D/g, '').length < 7)) {
+    return res.status(400).json({ message: 'Enter a valid phone number.' });
+  }
+
+  try {
+    const duplicateEmail = await User.findOne({
+      email,
+      _id: { $ne: req.user.id },
+    });
+    if (duplicateEmail) {
+      return res.status(409).json({ message: 'That email address is already in use.' });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: { fullName, email, phone } },
+      { new: true, runValidators: true }
+    ).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    return res.status(200).json({ message: 'Profile updated successfully', user });
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({ message: 'That email address is already in use.' });
+    }
+    console.error('Error updating user profile:', error);
+    return res.status(500).json({ message: 'Could not update your profile.' });
+  }
+};
+
 exports.updateProfileImage = async (req, res) => {
   try {
     if (!req.file) {
@@ -107,10 +151,12 @@ exports.updateProfileImage = async (req, res) => {
     user.profileImageUrl = imageUrl;
     await user.save();
 
+    const safeUser = await User.findById(user._id).select('-password');
+
     res.status(200).json({
       message: 'Profile image updated successfully',
       imageUrl,
-      user,
+      user: safeUser,
     });
   } catch (error) {
     res.status(500).json({ message: 'Error updating profile image', error: error.message });

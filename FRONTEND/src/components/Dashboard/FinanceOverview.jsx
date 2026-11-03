@@ -3,28 +3,27 @@ import { LuTrendingUp, LuTrendingDown } from 'react-icons/lu';
 import { addThousandSeparators } from '../../utils/helper';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 
+const FinanceTooltip = ({ active, payload }) => {
+  if (!active || !payload?.length) return null;
+
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-lg">
+      <p className="text-sm font-medium text-slate-700">{payload[0].name}</p>
+      <p className="text-sm font-semibold text-slate-950">${addThousandSeparators(payload[0].value)}</p>
+    </div>
+  );
+};
+
 const FinanceOverview = ({ totalBalance, totalIncome, totalExpense }) => {
   // Calculate data for the donut chart
   const chartData = [
-    { name: 'Income', value: totalIncome, color: '#10b981' }, // green
-    { name: 'Expense', value: totalExpense, color: '#ef4444' }, // red
-    { name: 'Balance', value: Math.max(totalBalance, 0), color: '#a855f7' }, // purple
+    { name: 'Income', value: totalIncome, color: '#059669' },
+    { name: 'Expense', value: totalExpense, color: '#e11d48' },
+    { name: 'Balance', value: Math.max(totalBalance, 0), color: '#6d4aff' },
   ];
 
   // Filter out zero values for cleaner chart
   const filteredData = chartData.filter(item => item.value > 0);
-
-  const CustomTooltip = ({ active, payload }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
-          <p className="text-sm font-medium text-gray-800">{payload[0].name}</p>
-          <p className="text-sm font-bold text-gray-900">${addThousandSeparators(payload[0].value)}</p>
-        </div>
-      );
-    }
-    return null;
-  };
 
   const renderCenterContent = () => {
     return (
@@ -32,7 +31,7 @@ const FinanceOverview = ({ totalBalance, totalIncome, totalExpense }) => {
         <text 
           x="50%" 
           y="45%" 
-          fill="#666" 
+          fill="#64748b"
           textAnchor="middle" 
           fontSize="13" 
           fontWeight="500"
@@ -42,7 +41,7 @@ const FinanceOverview = ({ totalBalance, totalIncome, totalExpense }) => {
         <text 
           x="50%" 
           y="58%" 
-          fill="#1f2937" 
+          fill="#0f172a"
           textAnchor="middle" 
           fontSize="26" 
           fontWeight="bold"
@@ -54,8 +53,8 @@ const FinanceOverview = ({ totalBalance, totalIncome, totalExpense }) => {
   };
 
   return (
-    <div className="card p-6">
-      <h5 className="text-lg font-semibold mb-6">Financial Overview</h5>
+    <div className="card p-5 sm:p-6">
+      <h5 className="section-title mb-5">Financial overview</h5>
       
       {/* Donut Chart */}
       <div className="flex flex-col items-center justify-center">
@@ -74,21 +73,21 @@ const FinanceOverview = ({ totalBalance, totalIncome, totalExpense }) => {
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<FinanceTooltip />} />
             {renderCenterContent()}
           </PieChart>
         </ResponsiveContainer>
       </div>
 
       {/* Legend */}
-      <div className="mt-8 mb-8 flex justify-center gap-8 flex-wrap px-4">
+      <div className="mt-5 flex flex-wrap justify-center gap-x-6 gap-y-3 px-2">
         {filteredData.map((item, index) => (
           <div key={index} className="flex items-center gap-2">
             <div 
-              className="w-4 h-4 rounded-full" 
+              className="h-3 w-3 rounded-full"
               style={{ backgroundColor: item.color }}
             ></div>
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium text-slate-600">
               {item.name}: <span style={{ color: item.color }} className="font-bold">${addThousandSeparators(item.value)}</span>
             </span>
           </div>
