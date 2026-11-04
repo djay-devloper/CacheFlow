@@ -1,6 +1,7 @@
 const { getFinanceReport } = require('../services/financeAnalytics');
 
 const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
+const FALLBACK_GEMINI_MODEL = 'gemini-3.5-flash';
 
 const createPrompt = (question, report) => [
     'You are CacheFlow, a careful personal-finance data explainer.',
@@ -26,7 +27,6 @@ exports.askCopilot = async (req, res) => {
     try {
         const report = await getFinanceReport(req.user._id);
         const model = process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL;
-        const signal = AbortSignal.timeout(20000);
         const requestModel = (selectedModel) => fetch(
             `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(selectedModel)}:generateContent`,
             {
@@ -42,7 +42,7 @@ exports.askCopilot = async (req, res) => {
                     contents: [{ role: 'user', parts: [{ text: createPrompt(question.trim(), report) }] }],
                     generationConfig: { temperature: 0.2, maxOutputTokens: 500 },
                 }),
-                signal,
+                signal: AbortSignal.timeout(12000),
             }
         );
         let response = await requestModel(model);
@@ -50,10 +50,9 @@ exports.askCopilot = async (req, res) => {
             console.warn(`Gemini model ${model} is unavailable; retrying with ${DEFAULT_GEMINI_MODEL}`);
             response = await requestModel(DEFAULT_GEMINI_MODEL);
         }
-        if (response.status === 503) {
-            console.warn('Gemini is temporarily unavailable; retrying once');
-            await new Promise((resolve) => setTimeout(resolve, 500));
-            response = await requestModel(model === DEFAULT_GEMINI_MODEL ? model : DEFAULT_GEMINI_MODEL);
+        if (response.status === 503 && model !== FALLBACK_GEMINI_MODEL) {
+            console.warn(`Gemini model ${model} is temporarily unavailable; retrying with ${FALLBACK_GEMINI_MODEL}`);
+            response = await requestModel(FALLBACK_GEMINI_MODEL);
         }
 
         if (!response.ok) {

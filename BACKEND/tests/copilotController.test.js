@@ -4,7 +4,7 @@ const Income = require('../models/Income');
 const Expense = require('../models/Expense');
 const { askCopilot } = require('../controllers/copilotController');
 
-test('retries with the current Gemini model when the configured model is unavailable', async (t) => {
+test('falls back to an available Gemini model when configured and default models fail', async (t) => {
     const previousApiKey = process.env.GEMINI_API_KEY;
     const previousModel = process.env.GEMINI_MODEL;
     process.env.GEMINI_API_KEY = 'test-api-key';
@@ -19,9 +19,11 @@ test('retries with the current Gemini model when the configured model is unavail
     t.mock.method(Income, 'aggregate', async () => []);
     t.mock.method(Expense, 'aggregate', async () => []);
     const requestedModels = [];
-    t.mock.method(globalThis, 'fetch', async (url) => {
+    const requestSignals = [];
+    t.mock.method(globalThis, 'fetch', async (url, options) => {
         const model = new URL(url).pathname.split('/').at(-1).split(':')[0];
         requestedModels.push(model);
+        requestSignals.push(options.signal);
         if (requestedModels.length === 1) {
             return new Response(JSON.stringify({ error: { message: 'Model is unavailable' } }), { status: 404 });
         }
@@ -47,7 +49,8 @@ test('retries with the current Gemini model when the configured model is unavail
 
     await askCopilot({ body: { question: 'Summarize my finances.' }, user: { _id: 'test-user' } }, res);
 
-    assert.deepEqual(requestedModels, ['gemini-2.5-flash', 'gemini-3.8-flash', 'gemini-3.8-flash']);
+    assert.deepEqual(requestedModels, ['gemini-2.5-flash', 'gemini-3.8-flash', 'gemini-3.5-flash']);
+    assert.equal(new Set(requestSignals).size, 3);
     assert.equal(response.status, 200);
     assert.equal(response.body.answer, 'Your report has no recorded activity.');
     assert.deepEqual(response.body.data.totals, { income: 0, expenses: 0, net: 0 });
