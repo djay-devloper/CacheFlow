@@ -1,5 +1,7 @@
 const { getFinanceReport } = require('../services/financeAnalytics');
 
+const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
+
 const createPrompt = (question, report) => [
     'You are CacheFlow, a careful personal-finance data explainer.',
     'Answer the user using only the supplied JSON data. Never invent transactions, amounts, dates, or trends.',
@@ -23,9 +25,10 @@ exports.askCopilot = async (req, res) => {
 
     try {
         const report = await getFinanceReport(req.user._id);
-        const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
+        const model = process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL;
+        const signal = AbortSignal.timeout(20000);
+        const requestModel = (selectedModel) => fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(selectedModel)}:generateContent`,
             {
                 method: 'POST',
                 headers: {
@@ -39,16 +42,29 @@ exports.askCopilot = async (req, res) => {
                     contents: [{ role: 'user', parts: [{ text: createPrompt(question.trim(), report) }] }],
                     generationConfig: { temperature: 0.2, maxOutputTokens: 500 },
                 }),
-                signal: AbortSignal.timeout(20000),
+                signal,
             }
         );
+        let response = await requestModel(model);
+        if (response.status === 404 && model !== DEFAULT_GEMINI_MODEL) {
+            console.warn(`Gemini model ${model} is unavailable; retrying with ${DEFAULT_GEMINI_MODEL}`);
+            response = await requestModel(DEFAULT_GEMINI_MODEL);
+        }
+        if (response.status === 503) {
+            console.warn('Gemini is temporarily unavailable; retrying once');
+            await new Promise((resolve) => setTimeout(resolve, 500));
+            response = await requestModel(model === DEFAULT_GEMINI_MODEL ? model : DEFAULT_GEMINI_MODEL);
+        }
 
         if (!response.ok) {
             console.error('Gemini request failed with status:', response.status);
-            return res.status(response.status === 429 ? 503 : 502).json({
+            const isTemporarilyUnavailable = response.status === 429 || response.status === 503;
+            return res.status(isTemporarilyUnavailable ? 503 : 502).json({
                 message: response.status === 429
                     ? 'AI copilot is temporarily rate-limited; try again shortly'
-                    : 'AI copilot could not complete the request',
+                    : response.status === 503
+                        ? 'AI copilot is temporarily unavailable; try again shortly'
+                        : 'AI copilot could not complete the request',
             });
         }
 
