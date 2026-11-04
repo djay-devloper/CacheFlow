@@ -50,7 +50,7 @@ exports.askCopilot = async (req, res) => {
             console.warn(`Gemini model ${model} is unavailable; retrying with ${DEFAULT_GEMINI_MODEL}`);
             response = await requestModel(DEFAULT_GEMINI_MODEL);
         }
-        if (response.status === 503 && model !== FALLBACK_GEMINI_MODEL) {
+        if ([429, 503].includes(response.status) && model !== FALLBACK_GEMINI_MODEL) {
             console.warn(`Gemini model ${model} is temporarily unavailable; retrying with ${FALLBACK_GEMINI_MODEL}`);
             response = await requestModel(FALLBACK_GEMINI_MODEL);
         }
