@@ -45,7 +45,16 @@ exports.askCopilot = async (req, res) => {
                 signal: AbortSignal.timeout(12000),
             }
         );
-        let response = await requestModel(model);
+        let response;
+        try {
+            response = await requestModel(model);
+        } catch (error) {
+            if (!['TimeoutError', 'AbortError'].includes(error.name) || model === FALLBACK_GEMINI_MODEL) {
+                throw error;
+            }
+            console.warn(`Gemini model ${model} timed out; retrying with ${FALLBACK_GEMINI_MODEL}`);
+            response = await requestModel(FALLBACK_GEMINI_MODEL);
+        }
         if (response.status === 404 && model !== DEFAULT_GEMINI_MODEL) {
             console.warn(`Gemini model ${model} is unavailable; retrying with ${DEFAULT_GEMINI_MODEL}`);
             response = await requestModel(DEFAULT_GEMINI_MODEL);
